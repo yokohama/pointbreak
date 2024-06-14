@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
     Json, 
-    RequestPartsExt,  // これなに、消すとPartsのlifeタイムのエラーがでる。
+    RequestPartsExt,
     Router,
 };
 use axum_extra::{
@@ -24,7 +24,16 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::fmt::Display;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use tracing_subscriber::{
+    fmt, 
+    EnvFilter, 
+    layer::SubscriberExt, 
+    util::SubscriberInitExt
+};
+use tracing_appender::rolling;
+use tracing::debug;
+use std::io;
 
 mod routes;
 mod controller;
@@ -42,6 +51,8 @@ static KEYS: Lazy<Keys> = Lazy::new(|| {
 async fn main() {
     app_log_tracing();
 
+    debug!("#### start application ####");
+
     let app = Router::new()
         .route("/authorize", post(authorize))
         /*
@@ -58,7 +69,7 @@ async fn main() {
          * (axumよしなの詳細フロー)
          * 1. `protected`メソッドを探す
          * 2. `protected`メソッドのシグネチャを確認 > 引数にClaimsがある
-         * 3. Claims構造体には、`FromRequestRarts`トレイトのimplがある
+         * 3. Claims構造体には、`FromRequestRarts`トレイトの実装がある
          * 4. 自動的に、Claimsの`from_request_parts`を実行する
          * 5. その際、引数の`Parts`には、リクエストの内容が渡される(axumのよしな)
          */
@@ -81,16 +92,18 @@ async fn protected(claims: Claims) -> Result<String, AuthError> {
 }
 
 async fn authorize(Json(payload): Json<AuthPayload>) -> Result<Json<AuthBody>, AuthError> {
-    // Check if the user sent the credentials
+    // 認証
     if payload.client_id.is_empty() || payload.client_secret.is_empty() {
         return Err(AuthError::MissingCredentials);
     }
-
-    // Here you can check the user credentials from a database
     if payload.client_id != "foo" || payload.client_secret != "bar" {
         return Err(AuthError::WrongCredentials);
     }
 
+    /*
+     * 上記`foo`と`bar`で認証成功したユーザー情報を
+     * ここでDBから持ってきてclaimsにセットする。
+     */
     let claims = Claims {
         sub: "b@b.com".to_owned(),
         company: "ACME".to_owned(),
@@ -98,11 +111,10 @@ async fn authorize(Json(payload): Json<AuthPayload>) -> Result<Json<AuthBody>, A
         exp: 2000000000, // May 2033
     };
 
-    // Create the authorization token
+    // claimsの内容を使用してトークン生成
     let token = encode(&Header::default(), &claims, &KEYS.encoding)
         .map_err(|_| AuthError::TokenCreation)?;
 
-    // Send the authorized token
     Ok(Json(AuthBody::new(token)))
 }
 
@@ -164,14 +176,15 @@ where
     type Rejection = AuthError;
 
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        /* 
-         * TODO: ここでpartsの中身をデバッグしてみる。
-         * 何が入ってきてるのか？
-         */
+
+        debug!("{:#?}", parts);
+
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
             .await
             .map_err(|_| AuthError::InvalidToken)?;
+
+        // ここでトークンをデコードして検証
         let token_data = decode::<Claims>(bearer.token(), &KEYS.decoding, &Validation::default())
             .map_err(|_| AuthError::InvalidToken)?;
 
@@ -201,15 +214,26 @@ struct AuthPayload {
     client_secret: String,
 }
 
-// Appログのトレース設定
+// BUG: ログファイルに書き込まれない
+// $ RUST_LOG=debug cargo run
 fn app_log_tracing() {
-    tracing_subscriber::registry()
-        // 環境変数`RUST_LOG`をチェック。
-        // 何も設定されていなければ、myapp=debugをセットする。
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "myapp=debug".into()),
-        )
-        .with(tracing_subscriber::fmt::layer())
-        .init();
+    let file_appender = rolling::daily("./logs", "prefix.log");
+    let (non_blocking_writer, _guard) = tracing_appender::non_blocking(file_appender);
+
+    // 標準出力用レイヤー
+    let stdout_layer = fmt::layer()
+        .with_writer(io::stdout);
+
+    // ファイル出力用レイヤー
+    let file_layer = fmt::layer()
+        .with_writer(non_blocking_writer);
+
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("debug"));
+
+    let subscriber = tracing_subscriber::registry()
+        .with(env_filter)
+        .with(stdout_layer)
+        .with(file_layer);
+
+    subscriber.init();
 }
