@@ -9,6 +9,17 @@ services:
       - cargo-cache:/usr/local/cargo/registry
     environment:
       - RUST_LOG=debug
+  db:
+    image: postgres
+    container_name: pointbreak_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
 volumes:
   cargo-cache:
+  postgres_volume:

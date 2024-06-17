@@ -1,10 +1,13 @@
 use axum::{
-    routing::get,
+    routing::{get, post},
     Router,
 };
 
-use crate::controller;
+use crate::controllers::user;
 
 pub fn router() -> Router {
-    Router::new().route("/", get(|| async { controller::user::index().await }))
+    Router::new()
+        .route("/", get(|| async { user::welcome::index().await }))
+        .route("/session", post(user::session::create))
+        .route("/dashboard", get(user::dashboard::index))
 }

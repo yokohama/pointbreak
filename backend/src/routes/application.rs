@@ -3,9 +3,9 @@ use axum::{
     Router,
 };
 
-use crate::controller;
+use crate::controllers;
 
 pub fn router() -> Router {
     Router::new()
-        .route("/", get(|| async { controller::application::index().await }))
+        .route("/", get(|| async { controllers::application::index().await }))
 }

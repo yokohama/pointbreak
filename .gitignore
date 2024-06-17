@@ -1,3 +1,4 @@
 /backend/target
-logs/*
-!logs/.keep
+**/logs/*
+!**/logs/.keep
+**/.env
