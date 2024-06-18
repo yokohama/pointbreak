@@ -1,27 +1,37 @@
-use axum::Router;
+use axum::{
+    http::StatusCode,
+    Router,
+    response::IntoResponse,
+};
 
 use tracing::info;
 
+use dotenvy::dotenv;
+
 mod config;
 mod routes;
-
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
-use dotenvy::dotenv;
-use std::env;
+mod controllers;
+mod services;
+mod models;
+mod errors;
 
 #[tokio::main]
 async fn main() {
     config::logging::app_log_tracing();
 
+    dotenv().ok();
+
     info!("#### start application ####");
 
-    let connection = &mut establish_connection();
+    let pool = services::db::get_db_pool();
 
     let app = Router::new()
         .nest("/", routes::application::router())
         .nest("/user", routes::user::router())
-        .nest("/admin", routes::admin::router());
+        .nest("/admin", routes::admin::router())
+        .with_state(pool);
+
+    let app = app.fallback(handler_404);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await
@@ -30,10 +40,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-fn establish_connection() -> PgConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+async fn handler_404() -> impl IntoResponse {
+    (StatusCode::NOT_FOUND, "nothing to see here")
 }
+

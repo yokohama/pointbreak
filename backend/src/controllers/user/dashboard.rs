@@ -21,12 +21,10 @@
  * 5. その際、引数の`Parts`には、リクエストの内容が渡される(axumのよしな)
  */
 
-use crate::services::authorization::{
-    jwt::Claims,
-    auth::AuthError,
-};
+use crate::services::authorization::jwt::Claims;
+use crate::errors::AppError;
 
-pub async fn index(claims: Claims) -> Result<String, AuthError> {
+pub async fn index(claims: Claims) -> Result<String, AppError> {
     Ok(format!(
         "Welcome2 to the protected area :)\nYour data:\n{claims}",
     ))

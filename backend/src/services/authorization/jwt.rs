@@ -1,3 +1,6 @@
+use std::fmt::Display;
+use std::env;
+
 use axum::{
     async_trait,
     extract::FromRequestParts,
@@ -5,7 +8,10 @@ use axum::{
     RequestPartsExt,
 };
 use axum_extra::{
-    headers::{authorization::Bearer, Authorization},
+    headers::{
+        authorization::Bearer, 
+        Authorization
+    },
     TypedHeader,
 };
 use jsonwebtoken::{
@@ -16,14 +22,13 @@ use jsonwebtoken::{
 };
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 
 use tracing::debug;
 
-use super::auth::AuthError;
+use crate::errors::AppError;
 
 pub static KEYS: Lazy<Keys> = Lazy::new(|| {
-    let secret = std::env::var("JWT_SECRET").expect("`JWT_SECRET` must be set");
+    let secret = env::var("JWT_SECRET").expect("`JWT_SECRET` must be set");
     Keys::new(secret.as_bytes())
 });
 
@@ -45,7 +50,7 @@ impl<S> FromRequestParts<S> for Claims
 where
     S: Send + Sync,
 {
-    type Rejection = AuthError;
+    type Rejection = AppError;
 
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
 
@@ -54,11 +59,11 @@ where
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
             .await
-            .map_err(|_| AuthError::InvalidToken)?;
+            .map_err(|e| AppError::InvalidToken(e.to_string()))?;
 
         // ここでトークンをデコードして検証
         let token_data = decode::<Claims>(bearer.token(), &KEYS.decoding, &Validation::default())
-            .map_err(|_| AuthError::InvalidToken)?;
+            .map_err(|e| AppError::InvalidToken(e.to_string()))?;
 
         Ok(token_data.claims)
     }

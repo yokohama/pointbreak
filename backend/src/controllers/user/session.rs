@@ -8,18 +8,20 @@ use crate::services::authorization::jwt::{
     Claims,
 };
 use crate::services::authorization::auth::{
-    AuthError,
     AuthPayload,
     AuthBody,
 };
+use crate::errors::AppError;
 
-pub async fn create(Json(payload): Json<AuthPayload>) -> Result<Json<AuthBody>, AuthError> {
+pub async fn create(Json(payload): Json<AuthPayload>) -> Result<Json<AuthBody>, AppError> {
     // 認証
+    /*
     if payload.client_id.is_empty() || payload.client_secret.is_empty() {
-        return Err(AuthError::MissingCredentials);
+        return Err(AppError::MissingCredentials("".to_string()));
     }
+    */
     if payload.client_id != "foo" || payload.client_secret != "bar" {
-        return Err(AuthError::WrongCredentials);
+        return Err(AppError::WrongCredentials("missing client_id or client_secret".to_string()));
     }
 
     /*
@@ -35,7 +37,7 @@ pub async fn create(Json(payload): Json<AuthPayload>) -> Result<Json<AuthBody>, 
 
     // claimsの内容を使用してトークン生成
     let token = encode(&Header::default(), &claims, &KEYS.encoding)
-        .map_err(|_| AuthError::TokenCreation)?;
+        .map_err(|e| AppError::TokenCreation(e.to_string()))?;
 
     Ok(Json(AuthBody::new(token)))
 }
