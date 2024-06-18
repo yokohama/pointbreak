@@ -1,7 +1,4 @@
-# ビルドイメージ
 FROM rust:latest as builder
-
-ENV LANG C.UTF-8
 
 # 作業ディレクトリの設定
 ENV APP_NAME pointbreak
@@ -15,10 +12,9 @@ COPY src ./src
 RUN cargo build --release
 
 # 実行用イメージ
-#FROM debian:buster-slim
-FROM rust:latest
+FROM debian:buster-slim
+#FROM rust:latest
 
-# ライブラリのインストール
 RUN <<EOF
   apt-get update
   apt-get install -y libssl-dev ca-certificates

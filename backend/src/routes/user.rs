@@ -9,7 +9,6 @@ use deadpool_diesel::Pool;
 
 use crate::controllers::user;
 
-//pub fn router() -> Router {
 pub fn router() -> Router<Pool<Manager<PgConnection>>> {
     Router::new()
         .route("/", get(|| async { user::welcome::index().await }))

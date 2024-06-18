@@ -54,7 +54,7 @@ where
 
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
 
-        debug!("{:#?}", parts);
+        //debug!("{:#?}", parts);
 
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()

@@ -1,11 +1,13 @@
 version: '3.8'
 services:
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
     volumes:
-      - ./backend/src:/app/src
+      - ./backend/src:/opt/app/src
       - cargo-cache:/usr/local/cargo/registry
     env_file:
       - ./backend/.env
