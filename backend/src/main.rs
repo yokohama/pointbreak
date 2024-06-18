@@ -1,10 +1,7 @@
-use axum::{
-    http::StatusCode,
-    Router,
-    response::IntoResponse,
-};
+use axum::Router;
 
 use tracing::info;
+use tower_http::trace::TraceLayer;
 
 use dotenvy::dotenv;
 
@@ -29,9 +26,9 @@ async fn main() {
         .nest("/", routes::application::router())
         .nest("/user", routes::user::router())
         .nest("/admin", routes::admin::router())
-        .with_state(pool);
-
-    let app = app.fallback(handler_404);
+        .layer(TraceLayer::new_for_http())
+        .with_state(pool)
+        .fallback(errors::handler_404);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await
@@ -39,8 +36,3 @@ async fn main() {
 
     axum::serve(listener, app).await.unwrap();
 }
-
-async fn handler_404() -> impl IntoResponse {
-    (StatusCode::NOT_FOUND, "nothing to see here")
-}
-

@@ -19,6 +19,7 @@ pub fn app_log_tracing() {
   
     let subscriber = tracing_subscriber::registry()
         .with(env_filter)
+        .with(fmt::layer())
         .with(stdout_layer)
         .with(file_layer);
 
