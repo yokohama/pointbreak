@@ -7,11 +7,11 @@ services:
     volumes:
       - ./backend/src:/app/src
       - cargo-cache:/usr/local/cargo/registry
-    environment:
-      - RUST_LOG=debug
+    env_file:
+      - ./backend/.env
   db:
     image: postgres
-    container_name: pointbreak_postgres
+    container_name: pointbreak-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
