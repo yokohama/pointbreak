@@ -1,16 +1,19 @@
-version: '3.8'
 services:
   backend:
-    build: 
+    build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      target: 'development'   
     ports:
       - "3000:3000"
-    volumes:
-      - ./backend/src:/opt/app/src
-      - cargo-cache:/usr/local/cargo/registry
+    depends_on:
+      - db
     env_file:
       - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+
   db:
     image: postgres
     container_name: pointbreak-postgres
@@ -24,4 +27,5 @@ services:
 
 volumes:
   cargo-cache:
+  target-cache:
   postgres_volume:
