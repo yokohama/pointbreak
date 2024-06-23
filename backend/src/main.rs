@@ -12,7 +12,7 @@ mod errors;
 async fn main() {
     config::logging::app_log_tracing();
 
-    info!("#### start application ####");
+    info!("#### start application 2 ####");
     print_env();
 
     axum::serve(
