@@ -23,8 +23,6 @@ use jsonwebtoken::{
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-use tracing::debug;
-
 use crate::errors::AppError;
 
 pub static KEYS: Lazy<Keys> = Lazy::new(|| {

@@ -10,7 +10,7 @@ FROM development as build-stage
 RUN cargo build --release
 
 # production
-FROM rust:latest-slim-stretch
-COPY --from=build-stage /app/target/release/pointgreak .
+FROM rust:slim as production
+COPY --from=build-stage /app/target/release/pointbreak /usr/local/bin/
 EXPOSE 3000
 CMD ["/usr/local/bin/pointbreak"]
