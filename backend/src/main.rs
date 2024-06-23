@@ -1,5 +1,5 @@
 use std::env;
-use tracing::{debug, info};
+use tracing::{debug, info, error};
 
 mod config;
 mod routes;
@@ -12,8 +12,8 @@ mod errors;
 async fn main() {
     config::logging::app_log_tracing();
 
-    info!("#### start application 2 ####");
-    print_env();
+    info!("#### start application ####");
+    env_check();
 
     axum::serve(
         tokio::net::TcpListener::bind("0.0.0.0:3000")
@@ -23,7 +23,7 @@ async fn main() {
     ).await.unwrap();
 }
 
-fn print_env() {
+fn env_check() {
     let env_keys = vec![
         "RUST_BACKTRACE",
         "RUST_LOG",
@@ -34,7 +34,10 @@ fn print_env() {
     for key in env_keys {
         match env::var(key) {
             Ok(value) => debug!("{}: {}", key, value),
-            Err(_) => debug!("None! {}", key),
+            Err(_) => {
+                error!("Must be set env {}", key);
+                std::process::exit(1);
+            }
         }
     }
 }
