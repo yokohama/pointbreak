@@ -13,6 +13,8 @@ async fn main() {
     config::logging::app_log_tracing();
 
     info!("#### start application ####");
+    debug!("#### debug!");
+    info!("#### info!");
     print_env();
 
     axum::serve(
