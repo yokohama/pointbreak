@@ -35,5 +35,5 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: pointbreak
         run: |
-          docker build --target production -t ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest .
+          docker build --target production -t ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest ./backend
           docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
