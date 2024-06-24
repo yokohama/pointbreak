@@ -17,5 +17,8 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/* && \
   cargo install diesel_cli --no-default-features --features postgres
 COPY --from=build-stage /app/target/release/pointbreak /usr/local/bin/
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 EXPOSE 3000
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/local/bin/pointbreak"]
