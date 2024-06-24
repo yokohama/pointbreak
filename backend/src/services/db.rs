@@ -12,8 +12,6 @@ pub fn get_db_pool() -> Pool<Manager<PgConnection>> {
         deadpool_diesel::Runtime::Tokio1
     );
 
-    println!("{}", db_url);
-
     deadpool_diesel::postgres::Pool::builder(manager)
         .build()
         .unwrap_or_else(|_| panic!("Error connecting to {}", db_url))

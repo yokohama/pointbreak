@@ -2,6 +2,7 @@
 FROM rust:latest as development
 WORKDIR /app
 RUN cargo install cargo-watch
+RUN cargo install diesel_cli --no-default-features --features "postgres"
 COPY . .
 CMD ["cargo", "watch", "-w", "src", "-i", "target/*", "-x", "run"]
 

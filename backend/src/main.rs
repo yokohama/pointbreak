@@ -13,7 +13,7 @@ async fn main() {
     config::logging::app_log_tracing();
 
     info!("#### start application ####");
-    env_check();
+    debug_env();
 
     axum::serve(
         tokio::net::TcpListener::bind("0.0.0.0:3000")
@@ -23,7 +23,7 @@ async fn main() {
     ).await.unwrap();
 }
 
-fn env_check() {
+fn debug_env() {
     let env_keys = vec![
         "RUST_BACKTRACE",
         "RUST_LOG",
