@@ -9,7 +9,10 @@ echo "#### /app                #####"
 ls -l
 
 echo "#### /app/migrations     #####"
-ls migrations/
+ls -l migrations/
+
+echo "#### /app/src/schema.rs  #####"
+ls -l src/schema.rs
 
 echo "#### which diesel        #####"
 which diesel
