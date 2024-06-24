@@ -11,6 +11,11 @@ ls -l
 echo "#### /app/migrations     #####"
 ls migrations/
 
+echo "#### which diesel        #####"
+which diesel
+
+cd /app
+
 diesel migration run
 
 echo "#### entrypoint.sh end   #####"
