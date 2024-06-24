@@ -4,7 +4,12 @@ echo "#### entrypoint.sh start #####"
 
 echo "Current directory: $(pwd)"
 echo "Listing current directory contents:"
+
+echo "#### /app                #####"
 ls -l
+
+echo "#### /app/migrations     #####"
+ls migrations/
 
 diesel migration run
 
