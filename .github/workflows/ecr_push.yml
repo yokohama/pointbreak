@@ -1,0 +1,41 @@
+name: ecr push image
+
+on: 
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
+      - .gitignore
+
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    # `permissions` を設定しないと OIDC が使えないので注意
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+
+      # AWS 認証
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: "ap-northeast-1"
+          role-to-assume: "arn:aws:iam::465254350166:role/pointbreak-github-actions-ecr-push-role"
+
+      # ECR ログイン
+      - uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+        id: login-ecr
+
+      # Docker イメージを build/push する
+      - name: build and push docker image to ecr
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: pointbreak
+        run: |
+          docker build --target production -t ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest ./backend
+          docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest

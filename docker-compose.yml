@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      target: 'development'   
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+
+  db:
+    image: postgres
+    container_name: pointbreak-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  cargo-cache:
+  target-cache:
+  postgres_volume:
