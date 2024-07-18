@@ -3,7 +3,7 @@ mod common;
 use reqwest::Client;
 use tokio;
 
-const AUTH_URL: &str = "http://localhost:3000/admin/session/new";
+const AUTH_URL: &str = "http://localhost:3000/admin/session";
 const EMAIL: &str = "hoge5@example.com";
 const PASSWORD: &str = "passpass";
 
