@@ -1,9 +1,9 @@
-mod common;
-
 use pointbreak::models;
 use reqwest::Client;
 use reqwest::Response;
 use tokio;
+
+use crate::common;
 
 const AUTH_URL: &str = "http://localhost:3000/user/session";
 const EMAIL: &str = "hoge1@example.com";

@@ -11,16 +11,16 @@ use crate::{
 };
 
 #[derive(serde::Deserialize)]
-pub struct NewUserRequest {
+pub struct NewRequest {
     email: String,
     password: String,
 }
 
 pub async fn create(
     State(pool): State<PgPool>,
-    Json(payload): Json<NewUserRequest>,
+    Json(payload): Json<NewRequest>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
-    let new_user = user::NewUser {
+    let new_user = user::New {
         email: payload.email, 
         password: payload.password,
     };

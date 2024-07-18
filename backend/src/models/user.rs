@@ -1,18 +1,14 @@
 use chrono::NaiveDateTime;
 
 use serde::Serialize;
-use sqlx::{
-    PgPool,
-    query_as,
-    FromRow,
-};
+use sqlx::{PgPool, query_as, FromRow};
 
 use tracing::error;
 
 use crate::midleware::{auth, error};
 
 #[derive(Serialize, FromRow)]
-pub struct User {
+pub struct Entry {
     pub id: i32,
     pub name: Option<String>,
     pub email: String,
@@ -20,32 +16,32 @@ pub struct User {
     pub updated_at: NaiveDateTime,
 }
 
-pub struct NewUser {
+pub struct New {
     pub email: String,
     pub password: String,
 }
 
 #[derive(FromRow)]
-struct UserExists {
+struct Exists {
     email: String,
 }
 
 #[derive(Debug, Serialize, FromRow)]
-pub struct CreatedUser {
+pub struct Created {
     pub id: i32,
     pub email: String,
     pub created_at: NaiveDateTime,
 }
 
 #[derive(Serialize)]
-pub struct CurrentUser {
+pub struct Current {
     pub id: i32,
     pub name: Option<String>,
     pub email: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
-impl CurrentUser {
+impl Current {
     pub async fn new(
         pool: &PgPool, 
         id: i32
@@ -65,12 +61,12 @@ impl CurrentUser {
 pub async fn find_by_id(
     pool: &PgPool, 
     id: i32
-) -> Result<User, error::AppError> {
+) -> Result<Entry, error::AppError> {
     let sql = r#"
         SELECT id, name, email, created_at, updated_at FROM users
         WHERE id = $1
     "#;
-    let user: User = query_as::<_, User>(sql)
+    let user: Entry = query_as::<_, Entry>(sql)
         .bind(id)
         .fetch_one(pool)
         .await
@@ -81,11 +77,11 @@ pub async fn find_by_id(
     Ok(user)
 }
 
-pub async fn all(pool: &PgPool) -> Result<Vec<User>, error::AppError> {
+pub async fn all(pool: &PgPool) -> Result<Vec<Entry>, error::AppError> {
     let sql = r#"
         SELECT id, name, email, created_at, updated_at FROM users
     "#;
-    let users: Vec<User> = query_as::<_, User>(sql)
+    let users: Vec<Entry> = query_as::<_, Entry>(sql)
         .fetch_all(pool)
         .await
         .map_err(|e| {
@@ -98,15 +94,15 @@ pub async fn all(pool: &PgPool) -> Result<Vec<User>, error::AppError> {
 
 pub async fn create(
     pool: &PgPool, 
-    new_user: NewUser
-) -> Result<CreatedUser, error::AppError> {
+    new_user: New
+) -> Result<Created, error::AppError> {
     let sql = r#"
     SELECT email
     FROM users
     WHERE email = $1
     "#;
 
-    let user_exists = query_as::<_, UserExists>(sql)
+    let user_exists = query_as::<_, Exists>(sql)
     .bind(&new_user.email)
     .fetch_one(pool)
     .await;
@@ -138,7 +134,7 @@ pub async fn create(
                     error::AppError::InternalServerError(e.to_string())
                 })?;
 
-            let created_user = query_as::<_, CreatedUser>(sql)
+            let created_user = query_as::<_, Created>(sql)
                 .bind(&new_user.email)
                 .bind(encrypted_password)
                 .fetch_one(pool)
@@ -156,34 +152,3 @@ pub async fn create(
         }
     }
 }
-
-/*
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::midleware;
-
-    #[tokio::test]
-    async fn test_create_user() {
-        let pool = midleware::db::get_db_pool().await;
-
-        let new_user = NewUser {
-            email: "hoge100@example.com".to_string(),
-            password: "password".to_string(),
-        };
-
-        let result = create(&pool, new_user).await;
-
-        match result {
-            Ok(user) => {
-                assert_eq!(user.email, "hoge100@example.com");
-            }
-            Err(e) => {
-                error!("{:#?}", e);
-//                panic!("Failed to create user");
-            }
-        }
-    }
-}
-
-*/

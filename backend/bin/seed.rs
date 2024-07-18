@@ -33,7 +33,7 @@ async fn run_migrations(pool: &PgPool) {
 async fn run_seeds(pool: &PgPool) {
     for i in 1..=5 {
         let email = format!("hoge{}@example.com", i);
-        let new_user = models::user::NewUser {
+        let new_user = models::user::New {
             email,
             password: "passpass".to_string(),
         };

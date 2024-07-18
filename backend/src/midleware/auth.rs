@@ -124,12 +124,12 @@ impl Claims {
     pub async fn get_current_user(
         &self, 
         pool: &PgPool
-    ) -> Result<user::CurrentUser, error::AppError> {
+    ) -> Result<user::Current, error::AppError> {
         let user_id: i32 = self.sub.parse::<i32>().map_err(|e| {
             error!("Failed to parse sub to i32: {:#?}", e);
             error::AppError::InternalServerError(e.to_string())
         })?;
-        let current_user = user::CurrentUser::new(&pool, user_id).await?;
+        let current_user = user::Current::new(&pool, user_id).await?;
         Ok(current_user)
     }
 }
