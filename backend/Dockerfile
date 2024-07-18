@@ -2,11 +2,7 @@
 FROM rust:latest as development
 WORKDIR /app
 RUN cargo install cargo-watch
-# dockerの中でやるのめんどいから、ローカルにインストールする
-# 以下環境構築時に、cargo installで、sqlx-cliを実行してください。
-#RUN cargo install sqlx-cli --no-default-features --features postgres
 COPY . .
-#CMD ["cargo", "watch", "-w", "src", "-i", "target/*", "-x", "run"]
 CMD ["cargo", "watch", "-w", "src", "-i", "target/*", "-x", "run --bin pointbreak"]
 
 #=== build
