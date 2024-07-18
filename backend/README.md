@@ -9,6 +9,7 @@ $ cargo install sqlx-cli --no-default-features --features postgres
 ```
 $ git clone git@github.com:yokohama/pointbreak.git
 $ cd pointbreak
+$ mv .env.sample .env
 $ docker compose up
 ```
 ## DBマイグレーション
