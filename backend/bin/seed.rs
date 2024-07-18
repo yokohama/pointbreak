@@ -41,7 +41,7 @@ async fn run_seeds(pool: &PgPool) {
         let _ = models::user::create(pool, new_user).await;
     }
 
-    // update admin hoge5@example.com
+    // Update admin hoge5@example.com
     let sql = r#"
         UPDATE users set is_admin = TRUE
         WHERE email = 'hoge5@example.com'

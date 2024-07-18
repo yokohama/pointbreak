@@ -8,21 +8,21 @@ use sqlx::postgres::PgPool;
 use crate::controllers::{
     welcome,
     admin,
-    user
+    user,
 };
 use crate::midleware::error;
 
 pub fn get_routing(pool: PgPool) -> Router {
     Router::new().route("/", get(welcome::index))
-        .route("/admin/session/new", post(admin::authorization))
-        .route("/admin/dashboard", get(admin::dashboard))
-        .route("/admin/users", get(admin::users))
+        .route("/admin/session/new", post(admin::session::create))
+        .route("/admin/dashboard", get(admin::dashboard::show))
+        .route("/admin/users", get(admin::users::index))
 
-        .route("/user/registration", post(user::registration))
-        .route("/user/session/new", post(user::authorization))
-        .route("/user/dashboard", get(user::dashboard))
-        .route("/user/point_conditions", post(user::create_point_conditions))
-        .route("/user/point_conditions", get(user::point_conditions))
+        .route("/user/registration", post(user::registration::create))
+        .route("/user/session/new", post(user::session::create))
+        .route("/user/dashboard", get(user::dashboard::show))
+        .route("/user/point_conditions", get(user::point_conditions::index))
+        .route("/user/point_conditions", post(user::point_conditions::create))
 
         .with_state(pool)
         .fallback(error::not_found)
