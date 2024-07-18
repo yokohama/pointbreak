@@ -30,7 +30,7 @@ struct UserExists {
     email: String,
 }
 
-#[derive(Serialize, FromRow)]
+#[derive(Debug, Serialize, FromRow)]
 pub struct CreatedUser {
     pub id: i32,
     pub email: String,
@@ -156,3 +156,34 @@ pub async fn create(
         }
     }
 }
+
+/*
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::midleware;
+
+    #[tokio::test]
+    async fn test_create_user() {
+        let pool = midleware::db::get_db_pool().await;
+
+        let new_user = NewUser {
+            email: "hoge100@example.com".to_string(),
+            password: "password".to_string(),
+        };
+
+        let result = create(&pool, new_user).await;
+
+        match result {
+            Ok(user) => {
+                assert_eq!(user.email, "hoge100@example.com");
+            }
+            Err(e) => {
+                error!("{:#?}", e);
+//                panic!("Failed to create user");
+            }
+        }
+    }
+}
+
+*/

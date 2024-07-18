@@ -11,6 +11,7 @@ use serde_json::json;
 
 use tracing::info;
 
+#[derive(Debug)]
 pub enum AppError {
     NotFound(String),
     ConflictError(String),

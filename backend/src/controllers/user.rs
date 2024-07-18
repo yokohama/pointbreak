@@ -7,18 +7,18 @@ use sqlx::PgPool;
 
 use crate::{
     midleware::{auth, error},
-    models::user,
+    models::{user, point_condition},
 };
 
 #[derive(serde::Deserialize)]
-pub struct CreateUserRequest {
+pub struct NewUserRequest {
     email: String,
     password: String,
 }
 
 pub async fn registration(
     State(pool): State<PgPool>,
-    Json(payload): Json<CreateUserRequest>,
+    Json(payload): Json<NewUserRequest>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
     let new_user = user::NewUser {
         email: payload.email, 
@@ -42,4 +42,34 @@ pub async fn dashboard(
 ) -> Result<Json<impl Serialize>, error::AppError> {
     let current_user = claims.get_current_user(&pool).await?;
     Ok(Json(current_user))
+}
+
+#[derive(serde::Deserialize)]
+pub struct NewPointConditionRequest {
+    lat: f64,
+    lon: f64,
+}
+
+pub async fn create_point_conditions(
+    State(pool): State<PgPool>,
+    claims: auth::Claims,
+    Json(payload): Json<NewPointConditionRequest>,
+) -> Result<Json<impl Serialize>, error::AppError> {
+    let current_user = claims.get_current_user(&pool).await?;
+    let new = point_condition::New { 
+        user_id: current_user.id, 
+        lat: payload.lat,
+        lon: payload.lon,
+    };
+    let created = point_condition::create(&pool, new).await?;
+    Ok(Json(created))
+}
+
+pub async fn point_conditions(
+    State(pool): State<PgPool>,
+    claims: auth::Claims,
+) -> Result<Json<impl Serialize>, error::AppError> {
+    let current_user = claims.get_current_user(&pool).await?;
+    let point_conditions: Vec<point_condition::Entry> = point_condition::find_by_user_id(&pool, current_user.id).await?;
+    Ok(Json(point_conditions))
 }
