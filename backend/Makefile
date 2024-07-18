@@ -1,5 +1,5 @@
-PROFILE=yokohama
-CLOUDWATCH_LOG_GROUP=/aws/apprunner/pointbreak/b42ade55f9204e8288b623defc15a00d
+include .env
+export $(shell sed 's/=.*//' .env)
 
 migration-run:
 	sqlx migrate run --database-url postgres://postgres:password@localhost:/pointbreak
