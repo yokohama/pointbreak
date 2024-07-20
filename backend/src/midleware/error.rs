@@ -1,3 +1,5 @@
+use reqwest;
+
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -19,6 +21,12 @@ pub enum AppError {
     MissingCredentials(String),
     DatabaseError(String),
     InternalServerError(String),
+}
+
+impl From<reqwest::Error> for AppError {
+    fn from(err: reqwest::Error) -> Self {
+        AppError::InternalServerError(err.to_string())
+    }
 }
 
 impl From<sqlx::Error> for AppError {

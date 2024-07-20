@@ -9,7 +9,7 @@ pub async fn get_db_pool() -> PgPool {
         .expect("not found database url.");
 
     PgPoolOptions::new()
-        .max_connections(5)
+        .max_connections(10)
         .acquire_timeout(Duration::from_secs(3))
         .connect(&db_connection_str)
         .await

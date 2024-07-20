@@ -8,13 +8,9 @@ use sqlx::PgPool;
 use crate::{
     midleware::{auth, error},
     models::point_condition,
+    services::open_meteo,
+    requests,
 };
-
-#[derive(serde::Deserialize)]
-pub struct NewRequest {
-    lat: f64,
-    lon: f64,
-}
 
 pub async fn index(
     State(pool): State<PgPool>,
@@ -31,8 +27,19 @@ pub async fn index(
 pub async fn create(
     State(pool): State<PgPool>,
     claims: auth::Claims,
-    Json(payload): Json<NewRequest>,
+    Json(payload): Json<requests::point_condition::New>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
+
+    let res = open_meteo::get_marine_weather(
+        payload.lat,
+        payload.lon,
+        &payload.start_date,
+        &payload.end_date,
+        &payload.timezone,
+    ).await;
+
+    println!("{:#?}", res);
+
     let current_user = claims.get_current_user(&pool).await?;
     let new = point_condition::New { 
         user_id: current_user.id, 
@@ -40,5 +47,6 @@ pub async fn create(
         lon: payload.lon,
     };
     let created = point_condition::create(&pool, new).await?;
+
     Ok(Json(created))
 }

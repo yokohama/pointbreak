@@ -25,7 +25,7 @@ use jsonwebtoken::{
     Validation,
 };
 
-use sqlx::{ PgPool, FromRow };
+use sqlx::{PgPool, FromRow};
 
 use tracing::error;
 use serde::{Serialize, Deserialize};

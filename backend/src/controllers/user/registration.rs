@@ -8,17 +8,12 @@ use sqlx::PgPool;
 use crate::{
     midleware::error,
     models::user,
+    requests,
 };
-
-#[derive(serde::Deserialize)]
-pub struct NewRequest {
-    email: String,
-    password: String,
-}
 
 pub async fn create(
     State(pool): State<PgPool>,
-    Json(payload): Json<NewRequest>,
+    Json(payload): Json<requests::user::NewRegistration>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
     let new_user = user::New {
         email: payload.email, 

@@ -19,5 +19,5 @@ aws-logs-app:
 seed:
 	docker compose run --rm backend cargo run --bin seed
 
-test:
-	cargo test -- --nocapture && make seed
+test: seed
+	cargo test -- --nocapture --test-threads=1

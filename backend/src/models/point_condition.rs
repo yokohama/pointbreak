@@ -34,7 +34,7 @@ pub struct Entry {
 
 pub async fn create(
     pool: &PgPool, 
-    new_env: New
+    new_condition: New
 ) -> Result<Created, error::AppError> {
     let sql = r#"
         INSERT INTO point_conditions (
@@ -47,10 +47,10 @@ pub async fn create(
         RETURNING id, user_id, lat, lon
     "#;
 
-    let created_env = query_as::<_, Created>(sql)
-        .bind(new_env.user_id)
-        .bind(new_env.lat)
-        .bind(new_env.lon)
+    let created = query_as::<_, Created>(sql)
+        .bind(new_condition.user_id)
+        .bind(new_condition.lat)
+        .bind(new_condition.lon)
         .fetch_one(pool)
         .await
         .map_err(|e| {
@@ -58,7 +58,7 @@ pub async fn create(
             error::AppError::DatabaseError(e.to_string())
         })?;
 
-    Ok(created_env)
+    Ok(created)
 }
 
 pub async fn find_by_user_id(

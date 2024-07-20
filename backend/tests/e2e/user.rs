@@ -1,7 +1,8 @@
-use pointbreak::models;
 use reqwest::Client;
 use reqwest::Response;
 use tokio;
+
+use pointbreak::requests;
 
 use crate::common;
 
@@ -58,15 +59,17 @@ async fn point_conditions() {
     let client = Client::new();
     let jwt = common::get_jwt(&client, AUTH_URL, EMAIL, PASSWORD).await;
 
-    let new_condition = models::point_condition::New {
-        user_id: 1,
+    let new_condition_req = requests::point_condition::New {
         lat: 0.0,
         lon: 0.0,
+        start_date: "2024-07-20".to_string(),
+        end_date: "2024-07-20".to_string(),
+        timezone: "Asia/Tokyo".to_string(),
     };
 
     let res = client
         .post(url)
-        .json(&new_condition)
+        .json(&new_condition_req)
         .header("Authorization", format!("Bearer {}", jwt))
         .send()
         .await
