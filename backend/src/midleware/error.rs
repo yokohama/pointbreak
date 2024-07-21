@@ -11,7 +11,7 @@ use axum::{
 
 use serde_json::json;
 
-use tracing::info;
+use tracing::{info, error};
 
 #[derive(Debug)]
 pub enum AppError {
@@ -24,15 +24,23 @@ pub enum AppError {
 }
 
 impl From<reqwest::Error> for AppError {
-    fn from(err: reqwest::Error) -> Self {
-        AppError::InternalServerError(err.to_string())
+    fn from(error: reqwest::Error) -> Self {
+        match error {
+            _ => {
+                error!("{:#?}", error);
+                AppError::InternalServerError(error.to_string())
+            }
+        }
     }
 }
 
 impl From<sqlx::Error> for AppError {
     fn from(error: sqlx::Error) -> Self {
         match error {
-            _ => AppError::DatabaseError(error.to_string())
+            _ => {
+                error!("{:#?}", error);
+                AppError::DatabaseError(error.to_string())
+            }
         }
     }
 }

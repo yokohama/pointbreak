@@ -14,6 +14,9 @@ pub struct New {
     pub user_id: i32,
     pub lat: f64,
     pub lon: f64,
+    pub time: String,
+    pub swell_wave_height: f32,
+    pub swell_wave_direction: i32,
 }
 
 #[derive(Debug, FromRow, Serialize)]
@@ -22,6 +25,9 @@ pub struct Created {
     user_id: i32,
     lat: f64,
     lon: f64,
+    time: String,
+    swell_wave_height: f32,
+    swell_wave_direction: i32,
 }
 
 #[derive(FromRow, Serialize)]
@@ -41,16 +47,22 @@ pub async fn create(
             user_id, 
             lat,
             lon,
+            time,
+            swell_wave_height,
+            swell_wave_direction,
             created_at
         )
-        VALUES ($1, $2, $3, NOW())
-        RETURNING id, user_id, lat, lon
+        VALUES ($1, $2, $3, $4, $5, $6, NOW())
+        RETURNING id, user_id, lat, lon, time, swell_wave_height, swell_wave_direction
     "#;
 
     let created = query_as::<_, Created>(sql)
         .bind(new_condition.user_id)
         .bind(new_condition.lat)
         .bind(new_condition.lon)
+        .bind(new_condition.time)
+        .bind(new_condition.swell_wave_height)
+        .bind(new_condition.swell_wave_direction)
         .fetch_one(pool)
         .await
         .map_err(|e| {

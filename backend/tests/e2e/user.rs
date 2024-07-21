@@ -60,10 +60,10 @@ async fn point_conditions() {
     let jwt = common::get_jwt(&client, AUTH_URL, EMAIL, PASSWORD).await;
 
     let new_condition_req = requests::point_condition::New {
-        lat: 0.0,
-        lon: 0.0,
-        start_date: "2024-07-20".to_string(),
-        end_date: "2024-07-20".to_string(),
+        lat: 35.3741,
+        lon: 140.3708,
+        start_date: "2024-07-21".to_string(),
+        end_date: "2024-07-21".to_string(),
         timezone: "Asia/Tokyo".to_string(),
     };
 

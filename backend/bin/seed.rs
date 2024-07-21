@@ -53,16 +53,25 @@ async fn run_seeds(pool: &PgPool) {
             user_id: 1,
             lat: 34.052235, 
             lon: -118.243683,
+            time: "2024-07-20".to_string(),
+            swell_wave_direction: 0,
+            swell_wave_height: 0.0,
         },
         models::point_condition::New {
             user_id: 1,
             lat: 34.052335, 
             lon: -118.243682,
+            time: "2024-07-20".to_string(),
+            swell_wave_direction: 0,
+            swell_wave_height: 0.0,
         },
         models::point_condition::New {
             user_id: 1,
             lat: 34.052435, 
             lon: -118.243680,
+            time: "2024-07-20".to_string(),
+            swell_wave_direction: 0,
+            swell_wave_height: 0.0,
         },
     ];
     for condition in conditions {
