@@ -4,18 +4,12 @@ use serde::{Serialize, Deserialize};
 use crate::midleware::error;
 use crate::services::open_meteo;
 
-#[derive(Debug, Deserialize)]
-pub struct ForecastResponse {
-    pub latitude: f64,
-    pub longitude: f64,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Current {
-    rain: f32,
-    temperature: f32,
-    weather_code: i32,
-    wind_speed: f32,
+    pub rain: f32,
+    pub temperature: f32,
+    pub weather_code: i32,
+    pub wind_speed: f32,
 }
 impl Current {
     fn new(json: &serde_json::Value) -> Self {
@@ -34,10 +28,10 @@ impl Current {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CurrentUnits {
-    rain: String,
-    temperature: String,
-    weather_code: String,
-    wind_speed: String,
+    pub rain: String,
+    pub temperature: String,
+    pub weather_code: String,
+    pub wind_speed: String,
 }
 impl CurrentUnits {
     fn new(json: &serde_json::Value) -> Self {
@@ -52,8 +46,8 @@ impl CurrentUnits {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Forecast {
-    current: Current,
-    current_units: CurrentUnits,
+    pub current: Current,
+    pub units: CurrentUnits,
 }
 
 pub async fn fetch(
@@ -77,10 +71,9 @@ pub async fn fetch(
 
     let current = Current::new(&res);
     let current_units = CurrentUnits::new(&res);
-    println!("{:#?}", current);
 
     Ok(Forecast {
         current,
-        current_units,
+        units: current_units,
     })
 }

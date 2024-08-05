@@ -58,7 +58,18 @@ pub async fn create(
         lon: geocode.longitude,
         time: marine_weather.time,
         swell_wave_height: marine_weather.swell_wave_height,
+        swell_wave_height_unit: marine_weather.units.swell_wave_height,
         swell_wave_direction: marine_weather.swell_wave_direction,
+        swell_wave_direction_unit: marine_weather.units.swell_wave_direction,
+        rain: forecast.current.rain,
+        rain_unit: forecast.units.rain,
+        temperature: forecast.current.temperature,
+        temperature_unit: forecast.units.temperature,
+        weather_code: forecast.current.weather_code,
+        weather_code_unit: forecast.units.weather_code,
+        wind_speed: forecast.current.wind_speed,
+        wind_speed_unit: forecast.units.wind_speed,
+
     };
     let created = models::point_condition::create(&pool, new).await?;
 

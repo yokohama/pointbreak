@@ -1,3 +1,5 @@
+use chrono::Local;
+
 use reqwest::Client;
 use reqwest::Response;
 use tokio;
@@ -59,11 +61,14 @@ async fn point_conditions() {
     let client = Client::new();
     let jwt = common::get_jwt(&client, AUTH_URL, EMAIL, PASSWORD).await;
 
+    let today = Local::now();
+    let today = today.format("%Y-%m-%d");
+
     let new_condition_req = requests::point_condition::New {
         lat: 35.3741,
         lon: 140.3708,
-        start_date: "2024-07-21".to_string(),
-        end_date: "2024-07-21".to_string(),
+        start_date: today.to_string(),
+        end_date: today.to_string(),
         timezone: "Asia/Tokyo".to_string(),
     };
 
@@ -77,6 +82,13 @@ async fn point_conditions() {
 
     let status = res.status();
     assert_eq!(status, 200);
+
+    let created: serde_json::Value = res
+        .json()
+        .await
+        .expect("Json perse error.");
+    assert_eq!("35.3741", created["lat"].to_string());
+    assert_eq!("140.3708", created["lon"].to_string());
 
     let res = client
         .get(url)

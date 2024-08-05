@@ -1,7 +1,7 @@
 use chrono::{DateTime, NaiveDateTime, Utc};
 
 use reqwest::Client;
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 
 use crate::midleware::error;
 use crate::utils;
@@ -10,29 +10,10 @@ use crate::services::open_meteo::{
     get_array_from_request_json,
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct HourlyUnits {
-    pub time: String,
     pub swell_wave_height: String,
     pub swell_wave_direction: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Hourly {
-    pub time: Vec<String>,
-    pub swell_wave_height: Vec<f32>,
-    pub swell_wave_direction: Vec<i32>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct WeatherResponse {
-    pub latitude: f64,
-    pub longitude: f64,
-    pub generationtime_ms: f64,
-    pub timezone: String,
-    pub timezone_abbreviation: String,
-    pub hourly_units: HourlyUnits,
-    pub hourly: Hourly,
 }
 
 #[derive(Debug, Serialize)]
@@ -40,6 +21,7 @@ pub struct MarineWeather {
     pub time: String,
     pub swell_wave_height: f32,
     pub swell_wave_direction: i32,
+    pub units: HourlyUnits,
 }
 
 pub async fn fetch(
@@ -65,6 +47,8 @@ pub async fn fetch(
         .json::<serde_json::Value>()
         .await?;
 
+    println!("{:#?}", res);
+
     let times = get_array_from_request_json(&res["hourly"], "time")?;
     let swell_wave_heights = get_array_from_request_json(
         &res["hourly"], 
@@ -78,12 +62,19 @@ pub async fn fetch(
     let index = find_time_element_current_time_index(&times)
         .ok_or(error::AppError::InternalServerError("No match time element found.".to_string()))?;
 
+    let direction_unit = &res["hourly_units"]["swell_wave_direction"];
+    let height_unit = &res["hourly_units"]["swell_wave_height"];
+
     Ok(MarineWeather {
         time: times[index].as_str().unwrap().to_string(),
         swell_wave_height: swell_wave_heights[index]
             .as_f64().unwrap() as f32,
         swell_wave_direction: swell_wave_directions[index]
             .as_i64().unwrap() as i32,
+        units: HourlyUnits {
+            swell_wave_height: height_unit.to_string(),
+            swell_wave_direction: direction_unit.to_string(),
+        }
     })
 }
 
