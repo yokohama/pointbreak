@@ -1,11 +1,11 @@
 use sqlx::{PgPool, query};
 
-use pointbreak::midleware;
+use pointbreak::middleware;
 use pointbreak::models;
 
 #[tokio::main]
 async fn main() {
-    let db_pool = midleware::db::get_db_pool().await;
+    let db_pool = middleware::db::get_db_pool().await;
     reset_database(&db_pool).await;
     run_migrations(&db_pool).await;
     run_seeds(&db_pool).await;

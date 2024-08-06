@@ -5,7 +5,7 @@ use axum::{
 use serde::Serialize;
 use sqlx::PgPool;
 
-use crate::midleware::error;
+use crate::middleware::error;
 
 pub async fn show(State(pool): State<PgPool>) -> Result<Json<impl Serialize>, error::AppError> {
     println!("{:#?}", pool);

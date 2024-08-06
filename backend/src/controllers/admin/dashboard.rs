@@ -5,7 +5,7 @@ use axum::{
 use serde::Serialize;
 use sqlx::PgPool;
 
-use crate::midleware::{auth, error};
+use crate::middleware::{auth, error};
 
 pub async fn show(
     claims: auth::Claims, 

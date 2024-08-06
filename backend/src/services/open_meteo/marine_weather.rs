@@ -1,9 +1,13 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{
+    DateTime, 
+    NaiveDateTime, 
+    Utc
+};
 
 use reqwest::Client;
 use serde::Serialize;
 
-use crate::midleware::error;
+use crate::middleware::error;
 use crate::utils;
 use crate::services::open_meteo::{
     Geocode,
@@ -46,8 +50,6 @@ pub async fn fetch(
         .send().await?
         .json::<serde_json::Value>()
         .await?;
-
-    println!("{:#?}", res);
 
     let times = get_array_from_request_json(&res["hourly"], "time")?;
     let swell_wave_heights = get_array_from_request_json(
@@ -92,7 +94,7 @@ fn find_time_element_current_time_index(
             "%Y-%m-%dT%H:%M"
         ) {
             Ok(naive_time) => {
-                let time = DateTime::<Utc>::from_utc(naive_time, Utc);
+                let time = DateTime::<Utc>::from_naive_utc_and_offset(naive_time, Utc);
                 if time == current_time_utc {
                     return Some(i);
                 }

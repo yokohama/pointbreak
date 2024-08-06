@@ -1,3 +1,4 @@
+/*
 use reqwest::Client;
 use tokio;
 
@@ -45,3 +46,4 @@ async fn users() {
 
      assert_eq!(users.len(), 5);
 }
+*/

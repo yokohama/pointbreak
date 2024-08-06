@@ -1,4 +1,4 @@
-use axum::{ 
+use axum::{
     extract::State,
     response::Json,
 };
@@ -6,18 +6,18 @@ use serde::Serialize;
 use sqlx::PgPool;
 
 use crate::{
-    midleware::error,
+    middleware::error,
     models::user,
     requests,
 };
 
 pub async fn create(
     State(pool): State<PgPool>,
-    Json(payload): Json<requests::user::NewRegistration>,
+    validated_form: requests::JsonValidatedForm<requests::user::NewRegistration>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
     let new_user = user::New {
-        email: payload.email, 
-        password: payload.password,
+        email: validated_form.0.email,
+        password: validated_form.0.password,
     };
     let create_user = user::create(&pool, new_user).await?;
     Ok(Json(create_user))

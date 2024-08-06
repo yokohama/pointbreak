@@ -5,7 +5,7 @@ use sqlx::{PgPool, query_as, FromRow};
 
 use tracing::error;
 
-use crate::midleware::{auth, error};
+use crate::middleware::{auth, error};
 
 #[derive(Serialize, FromRow)]
 pub struct Entry {

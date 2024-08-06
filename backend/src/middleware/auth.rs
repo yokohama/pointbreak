@@ -32,7 +32,7 @@ use serde::{Serialize, Deserialize};
 use once_cell::sync::Lazy;
 
 use crate::{
-    midleware::error, 
+    middleware::error, 
     models::user
 };
 

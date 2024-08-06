@@ -6,7 +6,7 @@ use tracing::error;
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
-use crate::midleware::error::AppError;
+use crate::middleware::error::AppError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Geocode {

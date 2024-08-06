@@ -6,7 +6,7 @@ use serde::Serialize;
 use sqlx::PgPool;
 
 use crate::{
-    midleware::{auth, error}, 
+    middleware::{auth, error}, 
     models, 
     requests, 
     services::open_meteo::{

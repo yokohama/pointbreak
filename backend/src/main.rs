@@ -2,7 +2,7 @@ use tracing::info;
 use tower_http::trace::TraceLayer;
 
 mod routes;
-mod midleware;
+mod middleware;
 mod controllers;
 mod models;
 mod services;
@@ -11,12 +11,12 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
-    midleware::log::app_log_tracing();
+    middleware::log::app_log_tracing();
 
     info!("#### start application ####");
-    midleware::env::check_env();
+    middleware::env::check_env();
 
-    let db_pool = midleware::db::get_db_pool().await;
+    let db_pool = middleware::db::get_db_pool().await;
     let router = routes::get_routing(db_pool);
     let app = router.layer(TraceLayer::new_for_http());
 

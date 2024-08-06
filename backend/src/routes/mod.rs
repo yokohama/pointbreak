@@ -10,7 +10,7 @@ use crate::controllers::{
     admin,
     user,
 };
-use crate::midleware::error;
+use crate::middleware::error;
 
 pub fn get_routing(pool: PgPool) -> Router {
     Router::new()

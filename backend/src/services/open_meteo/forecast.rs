@@ -1,7 +1,7 @@
 use reqwest::Client;
 use serde::{Serialize, Deserialize};
 
-use crate::midleware::error;
+use crate::middleware::error;
 use crate::services::open_meteo;
 
 #[derive(Debug, Serialize, Deserialize)]

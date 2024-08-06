@@ -7,7 +7,7 @@ use sqlx::{
 
 use tracing::error;
 
-use crate::midleware::error;
+use crate::middleware::error;
 
 #[derive(Serialize)]
 pub struct New {

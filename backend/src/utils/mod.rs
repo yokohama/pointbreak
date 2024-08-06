@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc, FixedOffset, Timelike};
-use crate::midleware::error::AppError;
+use crate::middleware::error::AppError;
 
 pub fn get_current_time_jst() -> Result<DateTime<FixedOffset>, AppError> {
     let current_time_utc: DateTime<Utc> = Utc::now();

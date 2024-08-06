@@ -24,6 +24,13 @@ async fn registration_and_dashboard() {
         "password": PASSWORD,
     });
 
+    common::Curl::new(
+        "POST".to_string(), 
+        url.to_string(), 
+        &Some(data.clone()),
+        &None,
+    ).make();
+
     let res = client
         .post(url)
         .json(&data)
@@ -31,17 +38,14 @@ async fn registration_and_dashboard() {
         .await
         .expect("Failed to send request");
 
-    let status = res.status();
+    let (status, body) = common::make_res(res).await;
+    assert_eq!(status, 200);
 
-    let user: serde_json::Value = res
-        .json()
-        .await
+    let user: serde_json::Value = serde_json::from_str(&body)
         .expect("Failed to parse JSON");
 
-    assert_eq!(status, 200);
     assert_eq!(user["email"], NEW_USER_EMAIL);
 
-    let client = Client::new();
     let res = request_dashboard(&client, NEW_USER_EMAIL, PASSWORD).await;
 
     assert_eq!(res.status(), 200);
@@ -72,6 +76,13 @@ async fn point_conditions() {
         timezone: "Asia/Tokyo".to_string(),
     };
 
+    common::Curl::new(
+        "POST".to_string(), 
+        url.to_string(), 
+        &None,
+        &Some(jwt.clone())
+    ).make();
+
     let res = client
         .post(url)
         .json(&new_condition_req)
@@ -80,15 +91,21 @@ async fn point_conditions() {
         .await
         .expect("Failed to send request");
 
-    let status = res.status();
+    let (status, body) = common::make_res(res).await;
     assert_eq!(status, 200);
 
-    let created: serde_json::Value = res
-        .json()
-        .await
-        .expect("Json perse error.");
+    let created: serde_json::Value = serde_json::from_str(&body)
+        .expect("Failed to parse JSON");
+
     assert_eq!("35.3741", created["lat"].to_string());
     assert_eq!("140.3708", created["lon"].to_string());
+
+    common::Curl::new(
+        "POST".to_string(), 
+        url.to_string(), 
+        &None,
+        &Some(jwt.clone())
+    ).make();
 
     let res = client
         .get(url)
@@ -97,13 +114,11 @@ async fn point_conditions() {
         .await
         .expect("Failed to send request");
 
-    let status = res.status();
+    let (status, body) = common::make_res(res).await;
     assert_eq!(status, 200);
 
-    let conditions: Vec<serde_json::Value> = res
-        .json()
-        .await
-        .expect("Json perse error.");
+    let conditions: Vec<serde_json::Value> = serde_json::from_str(&body)
+        .expect("Failed to parse JSON");
 
     assert_eq!(conditions.len(), 4);
 }
@@ -114,7 +129,8 @@ async fn request_dashboard(
     password: &str
 ) -> Response {
     let url = "http://localhost:3000/user/dashboard";
-    let jwt = common::get_jwt(&client, AUTH_URL, email, password).await;
+    let jwt = common::get_jwt(&client, AUTH_URL, email, password)
+        .await;
 
     client
         .get(url)
