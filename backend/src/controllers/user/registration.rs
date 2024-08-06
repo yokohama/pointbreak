@@ -8,12 +8,15 @@ use sqlx::PgPool;
 use crate::{
     middleware::error,
     models::user,
-    requests,
+    requests::{
+        user::NewRegistration,
+        validations::JsonValidatedForm,
+    },
 };
 
 pub async fn create(
     State(pool): State<PgPool>,
-    validated_form: requests::JsonValidatedForm<requests::user::NewRegistration>,
+    validated_form: JsonValidatedForm<NewRegistration>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
     let new_user = user::New {
         email: validated_form.0.email,

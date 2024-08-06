@@ -13,6 +13,7 @@ const EMAIL: &str = "hoge1@example.com";
 const PASSWORD: &str = "passpass";
 
 const NEW_USER_EMAIL: &str = "hoge100@example.com";
+const NEW_USER_PASSWORD: &str = "XYz1234&&&";
 
 #[tokio::test]
 async fn registration_and_dashboard() {
@@ -21,7 +22,7 @@ async fn registration_and_dashboard() {
 
     let data = serde_json::json!({
         "email": NEW_USER_EMAIL,
-        "password": PASSWORD,
+        "password": NEW_USER_PASSWORD,
     });
 
     common::Curl::new(
@@ -46,7 +47,8 @@ async fn registration_and_dashboard() {
 
     assert_eq!(user["email"], NEW_USER_EMAIL);
 
-    let res = request_dashboard(&client, NEW_USER_EMAIL, PASSWORD).await;
+    let res = request_dashboard(&client, NEW_USER_EMAIL, NEW_USER_PASSWORD)
+        .await;
 
     assert_eq!(res.status(), 200);
 }

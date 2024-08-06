@@ -1,4 +1,3 @@
-/*
 use reqwest::Client;
 use tokio;
 
@@ -15,6 +14,13 @@ async fn dashboard() {
     let client = Client::new();
     let jwt = common::get_jwt(&client, AUTH_URL, EMAIL, PASSWORD).await;
 
+    common::Curl::new(
+        "GET".to_string(), 
+        url.to_string(), 
+        &None,
+        &Some(jwt.clone()),
+    ).make();
+
     let res = client
         .get(url)
         .header("Authorization", format!("Bearer {}", jwt))
@@ -22,7 +28,8 @@ async fn dashboard() {
         .await
         .expect("Failed to send request");
 
-    assert_eq!(res.status(), 200);
+    let (status, _body) = common::make_res(res).await;
+    assert_eq!(status, 200);
 }
 
 #[tokio::test]
@@ -32,6 +39,13 @@ async fn users() {
     let client = Client::new();
     let jwt = common::get_jwt(&client, AUTH_URL, EMAIL, PASSWORD).await;
 
+    common::Curl::new(
+        "GET".to_string(), 
+        url.to_string(), 
+        &None,
+        &Some(jwt.clone()),
+    ).make();
+
     let res = client
         .get(url)
         .header("Authorization", format!("Bearer {}", jwt))
@@ -39,11 +53,11 @@ async fn users() {
         .await
         .expect("Failed to send request");
 
-    let users: Vec<serde_json::Value> = res
-        .json()
-        .await
+    let (status, body) = common::make_res(res).await;
+    assert_eq!(status, 200);
+
+    let users: Vec<serde_json::Value> = serde_json::from_str(&body)
         .expect("Failed to parse JSON");
 
      assert_eq!(users.len(), 5);
 }
-*/

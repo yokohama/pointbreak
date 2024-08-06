@@ -55,7 +55,7 @@ impl<'a> Curl<'a> {
 
     pub fn make(&self) {
         let mut command = format!(
-            "curl -X {} '{}' 'Content-Type: application/json'", 
+            "curl -X {} '{}' -H 'Content-Type: application/json'", 
             self.method,
             self.url
         );
