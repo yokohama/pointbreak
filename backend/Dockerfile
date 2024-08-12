@@ -26,9 +26,10 @@ RUN apt-get update && \
 COPY --from=build-stage /app/target/release/pointbreak /usr/local/bin/
 
 COPY . .
-RUN chmod +x entrypoint.sh
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["/usr/local/bin/pointbreak"]
