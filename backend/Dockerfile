@@ -1,8 +1,13 @@
 #=== development
 FROM rust:latest as development
 WORKDIR /app
-RUN cargo install cargo-watch
+
+RUN cargo install cargo-watch && \
+  cargo install sqlx-cli --no-default-features --features postgres
+
 COPY . .
+
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["cargo", "watch", "-w", "src", "-i", "target/*", "-x", "run --bin pointbreak"]
 
 #=== build
@@ -11,7 +16,6 @@ RUN cargo build --release
 
 #=== production
 FROM rust:slim as production
-
 WORKDIR /app
 
 RUN apt-get update && \
