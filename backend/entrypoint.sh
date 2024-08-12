@@ -1,27 +1,10 @@
 #!/bin/sh
 
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########>>>"
-echo $DATABASE_URL
+echo "#- entrypoint.sh -------#"
+
+echo " - sqlx migrate run"
 sqlx migrate run
-if [ $? -ne 0 ]; then
-	echo "***********"
-else
-	echo "+++++++++++"
-fi
-echo "##########>>>"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
-echo "##########"
+
+echo "#----------------- end -#"
 
 exec "$@"
