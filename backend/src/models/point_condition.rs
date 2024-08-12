@@ -132,3 +132,20 @@ pub async fn find_by_user_id(
 
     Ok(conditions)
 }
+
+pub async fn all(
+    pool: &PgPool
+) -> Result<Vec<Entry>, error::AppError> {
+    let sql = r#"
+        SELECT * FROM point_conditions
+    "#;
+    let conditions = query_as::<_, Entry>(sql)
+        .fetch_all(pool)
+        .await
+        .map_err(|e| {
+            error!("{:#?}", e);
+            error::AppError::DatabaseError(e.to_string())
+        })?;
+
+    Ok(conditions)
+}
