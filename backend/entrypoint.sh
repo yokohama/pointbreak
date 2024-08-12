@@ -6,7 +6,7 @@ echo "##########"
 echo "##########"
 echo "##########"
 echo "##########"
-echo "##########"
+echo "##########>"
 echo $DATABASE_URL
 sqlx migrate run
 if [ $? -ne 0 ]; then
@@ -14,7 +14,7 @@ if [ $? -ne 0 ]; then
 else
 	echo "+++++++++++"
 fi
-echo "##########"
+echo "##########>"
 echo "##########"
 echo "##########"
 echo "##########"
