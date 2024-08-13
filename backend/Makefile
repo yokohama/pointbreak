@@ -21,3 +21,6 @@ seed:
 
 test: seed
 	cargo test -- --nocapture --test-threads=1
+
+test-production:
+	./bin/production_test.sh

@@ -5,7 +5,7 @@ use sqlx::{
     FromRow,
 };
 
-use tracing::{debug, error};
+use tracing::error;
 
 use crate::middleware::error;
 
@@ -62,14 +62,6 @@ pub async fn create(
     pool: &PgPool, 
     new_condition: New
 ) -> Result<Created, error::AppError> {
-    debug!("###");
-    debug!("###");
-    debug!("###");
-    debug!("###");
-    debug!("###");
-    debug!("###");
-    debug!("###");
-    debug!("###");
     let sql = r#"
         INSERT INTO point_conditions (
             user_id, 
@@ -93,7 +85,6 @@ pub async fn create(
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
         RETURNING id, user_id, lat, lon, time, swell_wave_height, swell_wave_height_unit, swell_wave_direction, swell_wave_direction_unit, rain, rain_unit, temperature, temperature_unit, weather_code, weather_code_unit, wind_speed, wind_speed_unit
     "#;
-    debug!("### 6");
 
     let created = query_as::<_, Created>(sql)
         .bind(new_condition.user_id)
@@ -118,7 +109,6 @@ pub async fn create(
             error!("{:#?}", e);
             error::AppError::DatabaseError(e.to_string())
         })?;
-    debug!("### 7");
 
     Ok(created)
 }

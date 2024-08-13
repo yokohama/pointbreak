@@ -47,7 +47,7 @@ async fn registration_and_dashboard() {
 
     assert_eq!(user["email"], NEW_USER_EMAIL);
 
-    let res = request_dashboard(&client, NEW_USER_EMAIL, NEW_USER_PASSWORD)
+    let res = get_dashboard(&client, NEW_USER_EMAIL, NEW_USER_PASSWORD)
         .await;
 
     assert_eq!(res.status(), 200);
@@ -56,7 +56,7 @@ async fn registration_and_dashboard() {
 #[tokio::test]
 async fn dashboard() {
     let client = Client::new();
-    let res = request_dashboard(&client, EMAIL, PASSWORD).await;
+    let res = get_dashboard(&client, EMAIL, PASSWORD).await;
 
     assert_eq!(res.status(), 200);
 }
@@ -127,7 +127,7 @@ async fn point_conditions() {
     assert_eq!(conditions.len(), 4);
 }
 
-async fn request_dashboard(
+async fn get_dashboard(
     client: &Client, 
     email: &str, 
     password: &str
@@ -137,7 +137,7 @@ async fn request_dashboard(
         .await;
 
     common::Curl::new(
-        "POST".to_string(), 
+        "GET".to_string(), 
         url.to_string(), 
         &None,
         &Some(jwt.clone())
