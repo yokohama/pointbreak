@@ -15,6 +15,13 @@ pub async fn get_jwt(
         "password": password,
     });
 
+    Curl::new(
+        "POST".to_string(), 
+        auth_url.to_string(), 
+        &Some(auth_data.clone()),
+        &None
+    ).make();
+
     let res = client
         .post(auth_url)
         .json(&auth_data)

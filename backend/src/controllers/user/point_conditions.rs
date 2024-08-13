@@ -4,6 +4,7 @@ use axum::{
 };
 use serde::Serialize;
 use sqlx::PgPool;
+use tracing::debug;
 
 use crate::{
     middleware::{auth, error}, 
@@ -34,10 +35,21 @@ pub async fn create(
     Json(payload): Json<requests::point_condition::New>,
 ) -> Result<Json<impl Serialize>, error::AppError> {
 
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+    debug!(">>");
+
     let geocode = open_meteo::Geocode {
         latitude: payload.lat,
         longitude: payload.lon,
     };
+    debug!(">> 1");
 
     let forecast = forecast::fetch(
         &geocode,
@@ -50,6 +62,7 @@ pub async fn create(
         &payload.end_date,
         &payload.timezone,
     ).await?;
+    debug!(">> 2");
 
     let current_user = claims.get_current_user(&pool).await?;
     let new = models::point_condition::New { 
@@ -71,7 +84,9 @@ pub async fn create(
         wind_speed_unit: forecast.units.wind_speed,
 
     };
+    debug!(">> 3");
     let created = models::point_condition::create(&pool, new).await?;
+    debug!(">> 4");
 
     Ok(Json(created))
 }

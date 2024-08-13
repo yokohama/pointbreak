@@ -78,10 +78,12 @@ async fn point_conditions() {
         timezone: "Asia/Tokyo".to_string(),
     };
 
+    let curl_value = serde_json::to_value(&new_condition_req)
+        .expect("Failed to convert to serde_json::Vlaue");
     common::Curl::new(
         "POST".to_string(), 
         url.to_string(), 
-        &None,
+        &Some(curl_value),
         &Some(jwt.clone())
     ).make();
 
@@ -103,7 +105,7 @@ async fn point_conditions() {
     assert_eq!("140.3708", created["lon"].to_string());
 
     common::Curl::new(
-        "POST".to_string(), 
+        "GET".to_string(), 
         url.to_string(), 
         &None,
         &Some(jwt.clone())
@@ -133,6 +135,13 @@ async fn request_dashboard(
     let url = "http://localhost:3000/user/dashboard";
     let jwt = common::get_jwt(&client, AUTH_URL, email, password)
         .await;
+
+    common::Curl::new(
+        "POST".to_string(), 
+        url.to_string(), 
+        &None,
+        &Some(jwt.clone())
+    ).make();
 
     client
         .get(url)
